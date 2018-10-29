@@ -56,7 +56,7 @@ We calculate stability values of Peruvian plantcutter
 
 
 ```{r}
-stabSpecies <- stability(current = current, future = future, thr.value=0.34)
+stabSpecies <- stability(current = current, project = future, thr.value=0.34)
 ```
 
 Details of Stability Models. Realize that  upper values to 100 show stability and lower values show areas with colonize potential.
