@@ -1,0 +1,75 @@
+---
+title: "Stability Models"
+author: "P. Joser Atachi & A. Townsend Peterson"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Stability models of species distribution}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Stability models 
+
+- Define stability based on future projection.
+- Show areas with potential of colonization on future projection.
+- Show areas with potential of stability condition on future projection.
+- Show areas with lost conditions in future  projection.
+
+## Peruvian plantcutter
+The maps used in this example was built for Peruviant plantcutter. 
+
+Peruvian plantcutter is a bird species endemic to the northern coast of Peru. It's considerated to be tied closely to dry forests (see Atauchi et al., 2018).
+
+In our case, we used maximum entropy approaches implemented in Maxent 3.3.3k (Phillips et al., 2006) for calibration models.  The best models was transferred to 2050 based on three global circulation models: HagGem2-ES, MIROC5 and ACCESS1-0 (RCP 8.5).
+
+
+## Stability Models
+
+Load current and future distribution of species
+
+```{r}
+library(sdStaf)
+
+# We read current distribution of Peruvian Plantcutter
+current_list <- list.files(path=paste(system.file(package="sdStaf"),
+                                      '/pre', sep=''), pattern='asc', full.names=TRUE)
+
+current <- raster::stack(current_list)
+
+# We read future distribution of Peruvian Plantcutter
+future_list <- list.files(path=paste(system.file(package="sdStaf"),
+                                     '/fut', sep=''), pattern='asc', full.names=TRUE)
+
+future <- raster::stack(future_list)
+
+```
+
+We calculate stability values of Peruvian plantcutter
+
+
+```{r}
+stabSpecies <- stability(current = current, future = future, thr.value=0.34)
+```
+
+Details of Stability Models. Realize that  upper values to 100 show stability and lower values show areas with colonize potential.
+
+Besides, It has built a stability maps that can be plotter with `plot(stabSpecies)`
+
+```{r}
+print(stabSpecies)
+
+```
+
+
+### References
+Atauchi et al. (2018). Species distribution models for Peruvian Plantcutter improve with consideration of biotic interactions. \emph{J. avian biology 2018: e01617} <https://onlinelibrary.wiley.com/doi/abs/10.1111/jav.01617>
+
+
