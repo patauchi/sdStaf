@@ -1,4 +1,4 @@
-# sdStaf 1.0.1
+# sdStaf 1.0.2
 
 ## Breaking changes
 
