@@ -1,7 +1,7 @@
 Package: sdStaf
 Type: Package
 Title: Species Distribution and Stability Future Models 
-Version: 1.0.1
+Version: 1.0.2
 Date: 2018-10-03
 Authors@R: c(person("P. Joser", "Atauchi", role = c("aut", "cre"),
                      email = "patauchi@gmail.com"))
