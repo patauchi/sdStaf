@@ -51,6 +51,8 @@ stim.M <- function (occs, radio, bgeo=NULL, ...)
 #' @export
 #'
 {
+  
+  
   if(is.null(bgeo)){
     rat <- 1000 * radio
     sp_po <- SpatialPoints(occs)
@@ -73,12 +75,14 @@ stim.M <- function (occs, radio, bgeo=NULL, ...)
     rat <- 1000 * radio
     sp_po <- SpatialPoints(occs)
     projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
+    projection(shapeOut) <- CRS('+proj=longlat +datum=WGS84')
     spbuf <- buffer(sp_po, width = rat)
 
     #plot(bu_z)
     #points(occ[,2:3], pch=16,cex=0.5)
 
     spbuf <- crop(shapeOut, spbuf)
+    
     plot(spbuf)
     #plot(M.zo)
     #paste0('Mask based on Biogeography. Morrone (2014)')
