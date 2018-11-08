@@ -77,7 +77,7 @@ stabl.con <- function(p, q, thr.value){
 
     qs.complex <- setValues(q.val, v)
 
-  plot(qs.complex)
+#  plot(qs.complex)
 
 
   # Build stability
