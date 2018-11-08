@@ -15,6 +15,7 @@
 #' @param occ_data A data.frame of occurrence records.
 #'  It must include two column based on latitude and longitude.
 #' @param mask Croped mask, must be shapefile (.shp), readOGR.
+#' @param parallel Logical. Build parallel process with each future project. Default is FALSE
 #'
 #' @return
 #'
@@ -62,7 +63,7 @@
 #' @export
 #'
 #'
-reduce.env <- function(env, transfer=NULL, occ_data, mask)
+reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
 {
   ptm <- proc.time()
   if(is.null(env)){
@@ -82,18 +83,74 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask)
 
   } else{
 
+    ## Setup timer
+    #timeG        <- rep(0,2)
+    #names(timeG) <- c("loop","for each")
+    ##
+    
     biovars.mask <- crop (env, mask)
     biovars.mask <- mask (biovars.mask, mask)
+    
     layer.transfer <- list()
-    for (i in 1:length(transfer)) {
+    
+    # Timer
+   # tick <- proc.time()[3]
+      # Core function
+      for (i in 1:length(transfer)) {
       layer.transfer[[i]] <- crop(transfer[[i]], mask)
       layer.transfer[[i]] <- mask(layer.transfer[[i]], mask)
-    }
+      }
+    # Timer produce
+   # tock    <- proc.time()[3]
+  #  timeG[1] <- tock - tick
+    # --- End Timer
+    
     datavalue <- extract(biovars.mask, occ_data)
     datavalue <- na.omit(datavalue)
 
   }
 
+  
+  
+  if(parallel == FALSE){
+    if(is.null(transfer))
+      message('You only have a one set of layers')
+      
+  } else {
+    if(is.null(transfer))
+      stop('Need to increase more layers')
+    
+    biovars.mask <- crop (env, mask)
+    biovars.mask <- mask (biovars.mask, mask)
+    
+    library(foreach)
+    library(doParallel)
+    
+    cores=detectCores()
+    cl <- makeCluster(cores[1]-1) #not to overload your computer
+    registerDoParallel(cl)
+
+    layer.transfer <- list()
+    # Timer
+   # tick <- proc.time()[3]
+    
+      # Core function
+    layer.transfer <- foreach(i=1:length(transfer)) %dopar% {
+      library(raster)
+      layer.transfer[[i]] <- crop(transfer[[i]], mask)
+      layer.transfer[[i]] <- mask(layer.transfer[[i]], mask)
+    }
+    
+    # Timer producer
+   # tock <- proc.time()[3]
+  #  timeG[2] <- tock - tick
+    #--- End timer 
+   # timeG
+    # Stop cluster
+    # stopCluster(cl)
+    
+  }
+  
   r <- EnvimRed(cropa = biovars.mask,
                  project = layer.transfer,
                  m.env = datavalue)
@@ -101,6 +158,7 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask)
   timed <- proc.time() - ptm
   t.min <- floor(timed[3] / 60)
   t.sec <- timed[3] - (t.min * 60)
+  
   message(paste("Environmental data completed in", t.min, "minutes", round(t.sec, 2), "seconds."))
 
   return(r)
