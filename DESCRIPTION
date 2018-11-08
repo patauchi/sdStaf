@@ -1,7 +1,7 @@
 Package: sdStaf
 Type: Package
 Title: Species Distribution and Stability Future Models 
-Version: 1.0.2
+Version: 1.0.3
 Date: 2018-10-29
 Authors@R: c(person("P. Joser", "Atauchi", role = c("aut", "cre"),
                      email = "patauchi@gmail.com"))
@@ -22,5 +22,6 @@ Imports:
   dismo
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    doParallel
 VignetteBuilder: knitr
