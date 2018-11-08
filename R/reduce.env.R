@@ -84,23 +84,23 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
     }
     
     # Corta las variables ambientales originales (todo el mundo) hacia el area de interes.
-    biovars.mask <- crop (env, mask)
-    biovars.mask <- mask (biovars.mask, mask)
+    biovars.mask <- raster::crop (env, mask)
+    biovars.mask <- raster::mask (biovars.mask, mask)
     layer.transfer <- list('Don not have environment data')
     datavalue <- extract(env, occ_data)
     datavalue <- na.omit(datavalue)
 
   } else{
     if(parallel == FALSE){
-      biovars.mask <- crop (env, mask)
-      biovars.mask <- mask (biovars.mask, mask)
+      biovars.mask <- raster::crop (env, mask)
+      biovars.mask <- raster::mask (biovars.mask, mask)
       
       layer.transfer <- list()
       
       # Core function
       for (i in 1:length(transfer)) {
-        layer.transfer[[i]] <- crop(transfer[[i]], mask)
-        layer.transfer[[i]] <- mask(layer.transfer[[i]], mask)
+        layer.transfer[[i]] <- raster::crop(transfer[[i]], mask)
+        layer.transfer[[i]] <- raster::mask(layer.transfer[[i]], mask)
       }
       # Timer produce
       # tock    <- proc.time()[3]
@@ -110,8 +110,8 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
       datavalue <- extract(biovars.mask, occ_data)
       datavalue <- na.omit(datavalue)  
     } else {
-      biovars.mask <- crop (env, mask)
-      biovars.mask <- mask (biovars.mask, mask)
+      biovars.mask <- raster::crop (env, mask)
+      biovars.mask <- raster::mask (biovars.mask, mask)
       
       #library(foreach)
       #library(doParallel)
@@ -128,10 +128,11 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
       # Core function
       layer.transfer <- foreach(i=1:length(transfer)) %dopar% {
         
-        layer.transfer[[i]] <- crop(transfer[[i]], mask)
-        layer.transfer[[i]] <- mask(layer.transfer[[i]], mask)
+        layer.transfer[[i]] <- raster::crop(transfer[[i]], mask)
+        layer.transfer[[i]] <- raster::mask(layer.transfer[[i]], mask)
       };stopCluster(cl)
-      datavalue <- matrix()
+       datavalue <- extract(env, occ_data)
+    datavalue <- na.omit(datavalue)
     }
     
 
