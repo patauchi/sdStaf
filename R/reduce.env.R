@@ -74,8 +74,15 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
   if (is.null(occ_data)){
     stop('You need to define ocurrence data (Longitude/Latitude)')
   }
+  if(is.null(mask)){
+    stop('You need to build M hypothesis before to do this')
+  }
 
   if(is.null(transfer)){
+    if(parallel == TRUE){
+      message('You have a one dataset, parallel = FALSE ' )
+    }
+    
     # Corta las variables ambientales originales (todo el mundo) hacia el area de interes.
     biovars.mask <- crop (env, mask)
     biovars.mask <- mask (biovars.mask, mask)
@@ -84,76 +91,52 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
     datavalue <- na.omit(datavalue)
 
   } else{
-
-    ## Setup timer
-    #timeG        <- rep(0,2)
-    #names(timeG) <- c("loop","for each")
-    ##
-    
-    biovars.mask <- crop (env, mask)
-    biovars.mask <- mask (biovars.mask, mask)
-    
-    layer.transfer <- list()
-    
-    # Timer
-   # tick <- proc.time()[3]
+    if(parallel == FALSE){
+      biovars.mask <- crop (env, mask)
+      biovars.mask <- mask (biovars.mask, mask)
+      
+      layer.transfer <- list()
+      
       # Core function
       for (i in 1:length(transfer)) {
-      layer.transfer[[i]] <- crop(transfer[[i]], mask)
-      layer.transfer[[i]] <- mask(layer.transfer[[i]], mask)
+        layer.transfer[[i]] <- crop(transfer[[i]], mask)
+        layer.transfer[[i]] <- mask(layer.transfer[[i]], mask)
       }
-    # Timer produce
-   # tock    <- proc.time()[3]
-  #  timeG[1] <- tock - tick
-    # --- End Timer
-    
-    datavalue <- extract(biovars.mask, occ_data)
-    datavalue <- na.omit(datavalue)
-
-  }
-
-  
-  
-  if(parallel == FALSE){
-    if(is.null(transfer))
-      message('You only have a one set of layers')
+      # Timer produce
+      # tock    <- proc.time()[3]
+      #  timeG[1] <- tock - tick
+      # --- End Timer
       
-  } else {
-    if(is.null(transfer))
-      stop('Need to increase more layers')
-    
-    biovars.mask <- crop (env, mask)
-    biovars.mask <- mask (biovars.mask, mask)
-    
-    #library(foreach)
-    #library(doParallel)
-    
-    cores = detectCores()
-    cl <- makeCluster(cores[1]-1) #not to overload your computer
-    
-    registerDoParallel(cl)
-
-    layer.transfer <- list()
-    # Timer
-   # tick <- proc.time()[3]
-    
+      datavalue <- extract(biovars.mask, occ_data)
+      datavalue <- na.omit(datavalue)  
+    } else {
+      biovars.mask <- crop (env, mask)
+      biovars.mask <- mask (biovars.mask, mask)
+      
+      #library(foreach)
+      #library(doParallel)
+      
+      cores = detectCores()
+      cl <- makeCluster(cores[1]-1) #not to overload your computer
+      
+      registerDoParallel(cl)
+      
+      layer.transfer <- list()
+      # Timer
+      # tick <- proc.time()[3]
+      
       # Core function
-    layer.transfer <- foreach(i=1:length(transfer)) %dopar% {
-      
-      layer.transfer[[i]] <- crop(transfer[[i]], mask)
-      layer.transfer[[i]] <- mask(layer.transfer[[i]], mask)
-    };stopCluster(cl)
+      layer.transfer <- foreach(i=1:length(transfer)) %dopar% {
+        
+        layer.transfer[[i]] <- crop(transfer[[i]], mask)
+        layer.transfer[[i]] <- mask(layer.transfer[[i]], mask)
+      };stopCluster(cl)
+      datavalue <- matrix()
+    }
+    
 
-    
-    # Timer producer
-   # tock <- proc.time()[3]
-  #  timeG[2] <- tock - tick
-    #--- End timer 
-   # timeG
-    # Stop cluster
-    # stopCluster(cl)
-    
   }
+
   
   r <- EnvimRed(cropa = biovars.mask,
                  project = layer.transfer,

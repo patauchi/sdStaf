@@ -64,11 +64,11 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
     }
   
   if(method == "Mx.dist"){
-    dm <- distm(occs)
+    dm <- geosphere::distm(occs)
     radio <- max(dm)/1000
   }
   if(method == "mean"){
-    dm <- distm(occs)
+    dm <- geosphere::distm(occs)
     radio <- mean(dm)/1000
   }
 
