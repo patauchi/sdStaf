@@ -47,7 +47,7 @@ plot(predictor$bio1)
 Next function, reduce environmental data based on buffer zone and customer zone.
 
 ```{r}
-buf.M <- stim.M(phytotoma[,2:3], radio = 131)
+buf.M <- stim.M(phytotoma[,2:3], radio = 131, method = 'user')
 
 reduce_cut <- reduce.env(env = predictor, occ_data = phytotoma[,2:3], mask= buf.M)
 

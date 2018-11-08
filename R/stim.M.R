@@ -2,7 +2,7 @@
 #'
 #' Returns buffer zone based on ocurrence data
 
-stim.M <- function (occs, radio, bgeo=NULL, ...)
+stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
 
 #'
 #' To define calibration area is crucial step (Barve et al., 2011),
@@ -15,6 +15,7 @@ stim.M <- function (occs, radio, bgeo=NULL, ...)
 #'
 #' @param occs data.frame of ocurrence data (longitude/latitude).
 #' @param radio radio of buffer.
+#' @param method default = 'user'. Another option is calculate the mean of all points 'mean'.
 #' @param bgeo Biogeographical layer. Categorical values.
 #' @param ... Optional features of buffer
 #'
@@ -51,8 +52,26 @@ stim.M <- function (occs, radio, bgeo=NULL, ...)
 #' @export
 #'
 {
+  METHODS <- c("user", "Mx.dist","mean")
   
+  method <- match.arg(method, METHODS)
+
+  if(method == "user")
+  {
+    if(is.null(radio))
+      stop('Define calibration radio')
+    radio
+    }
   
+  if(method == "Mx.dist"){
+    dm <- geosphere::distm(phytotoma[,2:3])
+    radio <- max(dm)/1000
+  }
+  if(method == "mean"){
+    dm <- geosphere::distm(phytotoma[,2:3])
+    radio <- mean(dm)/1000
+  }
+
   if(is.null(bgeo)){
     rat <- 1000 * radio
     sp_po <- SpatialPoints(occs)
@@ -82,19 +101,13 @@ stim.M <- function (occs, radio, bgeo=NULL, ...)
     #points(occ[,2:3], pch=16,cex=0.5)
 
     spbuf <- crop(shapeOut, spbuf)
+    spbuf <- mask(spbuf, spbuf)
     
-    plot(spbuf)
+    #plot(spbuf)
     #plot(M.zo)
     #paste0('Mask based on Biogeography. Morrone (2014)')
     #paste0(b_ex)
     return(spbuf)
   }
-
-
-
-
-
-
-
 
 }
