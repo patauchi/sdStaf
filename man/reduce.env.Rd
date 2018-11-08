@@ -4,7 +4,7 @@
 \alias{reduce.env}
 \title{Reduce environmental data}
 \usage{
-reduce.env(env, transfer = NULL, occ_data, mask)
+reduce.env(env, transfer = NULL, occ_data, mask, parallel = FALSE)
 }
 \arguments{
 \item{env}{RasterStack* objet.}
@@ -15,6 +15,8 @@ reduce.env(env, transfer = NULL, occ_data, mask)
 It must include two column based on latitude and longitude.}
 
 \item{mask}{Croped mask, must be shapefile (.shp), readOGR.}
+
+\item{parallel}{Logical. Build parallel process with each future project. Default is FALSE.}
 }
 \value{
 \code{@crop} RasterStack* Objet
