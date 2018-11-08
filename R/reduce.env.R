@@ -1,3 +1,6 @@
+if (getRversion() >= "2.15.1") { utils::globalVariables(c("detectCores","makeCluster",
+                                                          "registerDoParallel","%dopar%","foreach",
+                                                          "stopCluster","distm"))}
 
 #' Reduce environmental data
 #' @description
@@ -15,7 +18,7 @@
 #' @param occ_data A data.frame of occurrence records.
 #'  It must include two column based on latitude and longitude.
 #' @param mask Croped mask, must be shapefile (.shp), readOGR.
-#' @param parallel Logical. Build parallel process with each future project. Default is FALSE
+#' @param parallel Logical. Build parallel process with each future project. Default is FALSE.
 #'
 #' @return
 #'
@@ -61,7 +64,6 @@
 #'
 #'
 #' @export
-#'
 #'
 reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
 {
@@ -123,11 +125,12 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
     biovars.mask <- crop (env, mask)
     biovars.mask <- mask (biovars.mask, mask)
     
-    library(foreach)
-    library(doParallel)
+    #library(foreach)
+    #library(doParallel)
     
-    cores=detectCores()
+    cores = detectCores()
     cl <- makeCluster(cores[1]-1) #not to overload your computer
+    
     registerDoParallel(cl)
 
     layer.transfer <- list()
@@ -136,10 +139,11 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
     
       # Core function
     layer.transfer <- foreach(i=1:length(transfer)) %dopar% {
-      library(raster)
+      
       layer.transfer[[i]] <- crop(transfer[[i]], mask)
       layer.transfer[[i]] <- mask(layer.transfer[[i]], mask)
-    }
+    };stopCluster(cl)
+
     
     # Timer producer
    # tock <- proc.time()[3]
