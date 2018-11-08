@@ -37,7 +37,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
 #' 45(10-11): 667–674.
 #'
 #' @importFrom sp CRS SpatialPoints
-#'
+#' 
 #' @examples
 #'
 #' # Phytotoma ocurrence data
@@ -50,7 +50,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
 #' points(phytotoma[,2:3])
 #'
 #' @export
-#'
+
 {
   METHODS <- c("user", "Mx.dist","mean")
   
@@ -64,11 +64,11 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
     }
   
   if(method == "Mx.dist"){
-    dm <- geosphere::distm(phytotoma[,2:3])
+    dm <- distm(occs)
     radio <- max(dm)/1000
   }
   if(method == "mean"){
-    dm <- geosphere::distm(phytotoma[,2:3])
+    dm <- distm(occs)
     radio <- mean(dm)/1000
   }
 
@@ -94,7 +94,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
     rat <- 1000 * radio
     sp_po <- SpatialPoints(occs)
     projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-    projection(shapeOut) <- CRS('+proj=longlat +datum=WGS84')
+    
     spbuf <- buffer(sp_po, width = rat)
 
     #plot(bu_z)
@@ -102,7 +102,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
 
     spbuf <- crop(shapeOut, spbuf)
     spbuf <- mask(spbuf, spbuf)
-    
+    projection(shapeOut) <- CRS('+proj=longlat +datum=WGS84')
     #plot(spbuf)
     #plot(M.zo)
     #paste0('Mask based on Biogeography. Morrone (2014)')

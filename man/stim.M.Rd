@@ -4,7 +4,7 @@
 \alias{stim.M}
 \title{Build buffer zone to M}
 \usage{
-stim.M(occs, radio, bgeo = NULL, ...)
+stim.M(occs, radio = NULL, bgeo = NULL, method = "user", ...)
 }
 \arguments{
 \item{occs}{data.frame of ocurrence data (longitude/latitude).}
@@ -12,6 +12,8 @@ stim.M(occs, radio, bgeo = NULL, ...)
 \item{radio}{radio of buffer.}
 
 \item{bgeo}{Biogeographical layer. Categorical values.}
+
+\item{method}{default = 'user'. Another option is calculate the mean of all points 'mean'.}
 
 \item{...}{Optional features of buffer}
 }
