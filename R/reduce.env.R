@@ -130,8 +130,19 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
         
         layer.transfer[[i]] <- raster::crop(transfer[[i]], mask)
         layer.transfer[[i]] <- raster::mask(layer.transfer[[i]], mask)
-      };stopCluster(cl)
-       datavalue <- extract(env, occ_data)
+        save(layer.transfer[[i]])
+      }
+      save(layer.transfer)
+      
+      
+      stopCluster(cl)
+    
+      
+      
+      
+      
+      
+      datavalue <- extract(env, occ_data)
     datavalue <- na.omit(datavalue)
     }
     
