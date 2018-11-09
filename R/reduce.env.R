@@ -82,25 +82,25 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
     if(parallel == TRUE){
       message('You have a one dataset, parallel = FALSE ' )
     }
-    
+    mask.M <- mask
     # Corta las variables ambientales originales (todo el mundo) hacia el area de interes.
-    biovars.mask <- raster::crop (env, mask)
-    biovars.mask <- raster::mask (biovars.mask, mask)
+    biovars.mask <- crop (env, mask.M)
+    biovars.mask <- mask (biovars.mask, mask.M)
     layer.transfer <- list('Don not have environment data')
     datavalue <- extract(env, occ_data)
     datavalue <- na.omit(datavalue)
 
   } else{
     if(parallel == FALSE){
-      biovars.mask <- raster::crop (env, mask)
-      biovars.mask <- raster::mask (biovars.mask, mask)
+      biovars.mask <- crop (env, mask.M)
+      biovars.mask <- mask (biovars.mask, mask.M)
       
       layer.transfer <- list()
       
       # Core function
       for (i in 1:length(transfer)) {
-        layer.transfer[[i]] <- raster::crop(transfer[[i]], mask)
-        layer.transfer[[i]] <- raster::mask(layer.transfer[[i]], mask)
+        layer.transfer[[i]] <- crop(transfer[[i]], mask.M)
+        layer.transfer[[i]] <- mask(layer.transfer[[i]], mask.M)
       }
       # Timer produce
       # tock    <- proc.time()[3]
@@ -110,8 +110,8 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
       datavalue <- extract(biovars.mask, occ_data)
       datavalue <- na.omit(datavalue)  
     } else {
-      biovars.mask <- raster::crop (env, mask)
-      biovars.mask <- raster::mask (biovars.mask, mask)
+      biovars.mask <- crop (env, mask.M)
+      biovars.mask <- mask (biovars.mask, mask.M)
       
       #library(foreach)
       #library(doParallel)
@@ -122,28 +122,17 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
       registerDoParallel(cl)
       
       layer.transfer <- list()
-      # Timer
-      # tick <- proc.time()[3]
-      
+
       # Core function
-      layer.transfer <- foreach(i=1:length(transfer), .packages = "raster") %dopar% {
+      layer.transfer <- foreach(i=1:length(transfer), .packages = 'raster') %dopar% {
         
-        layer.transfer[[i]] <- raster::crop(transfer[[i]], mask)
-        layer.transfer[[i]] <- raster::mask(layer.transfer[[i]], mask)
-        save(layer.transfer[[i]])
-      }
-      save(layer.transfer)
+        layer.transfer[[i]] <- crop(transfer[[i]], mask.M)
+        layer.transfer[[i]] <- mask(layer.transfer[[i]], mask.M)
+      };stopCluster(cl)
       
       
-      stopCluster(cl)
-    
-      
-      
-      
-      
-      
-      datavalue <- extract(env, occ_data)
-    datavalue <- na.omit(datavalue)
+      datavalue <- extract(biovars.mask, occ_data)
+      datavalue <- na.omit(datavalue)
     }
     
 
