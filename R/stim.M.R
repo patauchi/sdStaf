@@ -100,14 +100,13 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
     #plot(bu_z)
     #points(occ[,2:3], pch=16,cex=0.5)
 
-<<<<<<< HEAD
+
     spbuf <- raster::crop(shapeOut, spbuf)
-    #spbuf <- mask(spbuf, spbuf)
+    spbuf <- raster::mask(spbuf, spbuf)
     
     #plot(spbuf)
     #plot(M.zo)
     paste0('Mask based on Biogeography. Morrone (2014)')
-=======
     spbuf <- crop(shapeOut, spbuf)
     #spbuf <- mask(spbuf, spbuf)
     
@@ -115,7 +114,6 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
     #plot(M.zo)
     paste0('Mask based on Biogeography. Morrone (2014)')
     paste0('We have defined the buffer radio: ', rat, ' Km')
->>>>>>> 46442615c058918a98a8457e83a9b52c67d31225
     #paste0(b_ex)
     return(spbuf)
   }
