@@ -37,7 +37,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
 #' 45(10-11): 667–674.
 #'
 #' @importFrom sp CRS SpatialPoints
-#' 
+#' @import doParallel
 #' @examples
 #'
 #' # Phytotoma ocurrence data
