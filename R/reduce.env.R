@@ -126,7 +126,7 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
       # tick <- proc.time()[3]
       
       # Core function
-      layer.transfer <- foreach(i=1:length(transfer)) %dopar% {
+      layer.transfer <- foreach(i=1:length(transfer), .packages = "raster") %dopar% {
         
         layer.transfer[[i]] <- raster::crop(transfer[[i]], mask)
         layer.transfer[[i]] <- raster::mask(layer.transfer[[i]], mask)
