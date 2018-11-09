@@ -121,7 +121,7 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
       
       registerDoParallel(cl)
       
-      layer.transfer <- list()
+      #layer.transfer <- list()
       # Timer
       # tick <- proc.time()[3]
       
@@ -131,7 +131,8 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
         layer.transfer[[i]] <- crop(transfer[[i]], mask)
         layer.transfer[[i]] <- mask(layer.transfer[[i]], mask)
       };stopCluster(cl)
-      datavalue <- matrix()
+      datavalue <- extract(biovars.mask, occ_data)
+      datavalue <- na.omit(datavalue)
     }
     
 

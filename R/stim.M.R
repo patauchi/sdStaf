@@ -94,18 +94,18 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
     rat <- 1000 * radio
     sp_po <- SpatialPoints(occs)
     projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-    
+    projection(shapeOut) <- CRS('+proj=longlat +datum=WGS84')
     spbuf <- buffer(sp_po, width = rat)
 
     #plot(bu_z)
     #points(occ[,2:3], pch=16,cex=0.5)
 
-    spbuf <- crop(shapeOut, spbuf)
-    spbuf <- mask(spbuf, spbuf)
-    projection(shapeOut) <- CRS('+proj=longlat +datum=WGS84')
+    spbuf <- raster::crop(shapeOut, spbuf)
+    #spbuf <- mask(spbuf, spbuf)
+    
     #plot(spbuf)
     #plot(M.zo)
-    #paste0('Mask based on Biogeography. Morrone (2014)')
+    paste0('Mask based on Biogeography. Morrone (2014)')
     #paste0(b_ex)
     return(spbuf)
   }
