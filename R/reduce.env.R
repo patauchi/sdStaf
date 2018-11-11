@@ -147,7 +147,7 @@ reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
   t.min <- floor(timed[3] / 60)
   t.sec <- timed[3] - (t.min * 60)
   
-  message(paste("Environmental data completed in", t.min, "minutes", round(t.sec, 2), "seconds."))
+  paste("Environmental data completed in", t.min, "minutes", round(t.sec, 2), "seconds.")
 
   return(r)
 
