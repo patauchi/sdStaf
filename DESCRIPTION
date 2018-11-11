@@ -12,8 +12,8 @@ Description: Functions for post processing the outcomes of ecological niche mode
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.0
-Depends: methods, stats,  dplyr, ggplot2,R (>= 2.10)
+RoxygenNote: 6.1.1
+Depends: methods, R (>= 3.2.0)
 Imports:
   sp,
   rgdal,
@@ -22,7 +22,11 @@ Imports:
   tidyr,
   raster,
   dismo,
-  geosphere
+  geosphere,
+  doParallel,
+  dplyr,
+  ggplot2,
+  stats
 Suggests: 
     knitr,
     rmarkdown
