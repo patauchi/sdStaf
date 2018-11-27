@@ -47,36 +47,16 @@ plot(predictor$bio1)
 Next function, reduce environmental data based on buffer zone and customer zone.
 
 ```{r}
-buf.M <- stim.M(phytotoma[,2:3], radio = 131)
+buf.M <- stim.M(occs=phytotoma[,2:3], radio = 131, method = 'user')
 
-reduce_cut <- reduce.env(env = predictor, occ_data = phytotoma[,2:3], mask= buf.M)
+# Define what variables we need to remove
+ rd <- c('bio1','bio12','bio16')
 
-plot(reduce_cut@cropa$bio1)
+reduce_cut <- reduce.env(env = predictor, mask= buf.M, var.rm = rd)
+
+plot(reduce_cut@cropa$biome)
 
 points(phytotoma[,2:3], pch=16,col='blue')
 
 ```
-
-We need to show correlogram of predictor variables
-
-```{r}
- cor.show(reduce_cut)
-
-# Define what variables we need to remove
- rd <- c('bio1','bio12','bio16','biome','bio8')
-```
-
-Remove `Rd` in `reduce_cut`, and we have these variables.
-
-```{r}
-cor.show(reduce_cut, rm=TRUE, var.rm = rd)
-```
-
-Define new environmental dataset (no-correlation)
-```{r}
-var_reduce <- dropLayer(reduce_cut@cropa, rd)
-
-names(var_reduce)
-```
-
 

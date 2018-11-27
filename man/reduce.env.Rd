@@ -4,19 +4,17 @@
 \alias{reduce.env}
 \title{Reduce environmental data}
 \usage{
-reduce.env(env, transfer = NULL, occ_data, mask, parallel = FALSE)
+reduce.env(env, transfer = NULL, var.rm, mask)
 }
 \arguments{
 \item{env}{RasterStack* objet.}
 
 \item{transfer}{List of rasterstack object}
 
-\item{occ_data}{A data.frame of occurrence records.
+\item{var.rm}{A data.frame of occurrence records.
 It must include two column based on latitude and longitude.}
 
 \item{mask}{Croped mask, must be shapefile (.shp), readOGR.}
-
-\item{parallel}{Logical. Build parallel process with each future project. Default is FALSE.}
 }
 \value{
 \code{@crop} RasterStack* Objet
@@ -46,26 +44,23 @@ predictor <- stack(list.files(path=paste(system.file(package="dismo"),'/ex', sep
 
  maskM <- stim.M(phytotoma[,2:3], 131)
 
-reduce_cut <- reduce.env(env = predictor, occ_data = phytotoma[,2:3], mask=maskM)
+vrn <- extract(predictor, phytotoma[,2:3])
+
+# Correlogram
+rd <- c('bio_1','bio_12','biome')
+cor.show(vrn, rm=TRUE, var.rm=rd)
+
+# Reduce spatial-data
+reduce_cut <- reduce.env(env = predictor, var.rm=rd, mask=maskM)
 
 # Plot reduce_cut
-plot(reduce_cut@cropa$bio1)
+plot(reduce_cut@cropa$bio16)
 
 # Add points
 points(phytotoma[,2:3], pch=16,col='blue')
 
-# Correlogram
-cor.show(reduce_cut)
-rd <- c('bio1','bio12','bio16','biome','bio8')
-
-# Removing rd-variables on correlogram
-cor.show(reduce_cut, rm=TRUE, var.rm = rd)
-
-# Remove rd-variables
-var_reduce <- dropLayer(reduce_cut@cropa, rd)
-
 # summary
-var_reduce
+reduce_cut
 
 
 }

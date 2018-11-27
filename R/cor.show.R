@@ -2,11 +2,11 @@
 #'
 #' Returns plot with correlation values among predicted variables.
 #'
-cor.show <- function(r, rm=FALSE, var.rm)
+cor.show <- function(values, rm=FALSE, var.rm)
 
 #' Correlation matrix based on pearson.
 #'
-#' @param r EnvimRed-class.
+#' @param values DataFrame-class.
 #' @param rm logical. If \code{TRUE}, allows remove some
 #' variables from imput data set. (\code{default = FALSE})
 #' @param var.rm variables names of imput data set. Using
@@ -23,12 +23,13 @@ cor.show <- function(r, rm=FALSE, var.rm)
 #' @export
 #'
 { # r es la clase producida por la funcion red.env.
+   r <- values
   if(rm==FALSE){
-    datavalue <- r@m.env
+    datavalue <- r
 
   } else{
     #datavalue <- datavalue[ ,!colnames(datavalue) == c('bio_12','bio_19','bio_18','bio_8') ]
-    datavalue <- (data.frame(r@m.env)) %>% dplyr::select(-one_of(var.rm))
+    datavalue <- (data.frame(r)) %>% dplyr::select(-one_of(var.rm))
     datavalue <- data.matrix(datavalue, rownames.force = NA)
 
   }

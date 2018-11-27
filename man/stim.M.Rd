@@ -4,7 +4,8 @@
 \alias{stim.M}
 \title{Build buffer zone to M}
 \usage{
-stim.M(occs, radio = NULL, bgeo = NULL, method = "user", ...)
+stim.M(occs, radio = NULL, bgeo = NULL, method = "user",
+  env = NULL, Vrc = 1, ncal = 1, ...)
 }
 \arguments{
 \item{occs}{data.frame of ocurrence data (longitude/latitude).}
@@ -14,6 +15,12 @@ stim.M(occs, radio = NULL, bgeo = NULL, method = "user", ...)
 \item{bgeo}{Biogeographical layer. Categorical values.}
 
 \item{method}{default = 'user'. Another option is calculate the mean of all points 'mean'.}
+
+\item{env}{if True. Environmental daataset used to build M. Only \code{method = 'Tol.pca'}}
+
+\item{Vrc}{Integer. sd(IQR) * value, used to increase range tolerance of dataset \code{env}}
+
+\item{ncal}{Integer. Dataset using to define IQR. Only \code{method = 'Tol.pca'}}
 
 \item{...}{Optional features of buffer}
 }

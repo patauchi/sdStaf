@@ -4,10 +4,10 @@
 \alias{cor.show}
 \title{Correlogram plot}
 \usage{
-cor.show(r, rm = FALSE, var.rm)
+cor.show(values, rm = FALSE, var.rm)
 }
 \arguments{
-\item{r}{EnvimRed-class.}
+\item{values}{DataFrame-class.}
 
 \item{rm}{logical. If \code{TRUE}, allows remove some
 variables from imput data set. (\code{default = FALSE})}

@@ -1,6 +1,3 @@
-if (getRversion() >= "2.15.1") { utils::globalVariables(c("detectCores","makeCluster",
-                                                          "registerDoParallel","%dopar%","foreach",
-                                                          "stopCluster","distm"))}
 
 #' Reduce environmental data
 #' @description
@@ -15,10 +12,9 @@ if (getRversion() >= "2.15.1") { utils::globalVariables(c("detectCores","makeClu
 #'
 #' @param env RasterStack* objet.
 #' @param transfer List of rasterstack object
-#' @param occ_data A data.frame of occurrence records.
+#' @param var.rm A data.frame of occurrence records.
 #'  It must include two column based on latitude and longitude.
 #' @param mask Croped mask, must be shapefile (.shp), readOGR.
-#' @param parallel Logical. Build parallel process with each future project. Default is FALSE.
 #'
 #' @return
 #'
@@ -41,113 +37,81 @@ if (getRversion() >= "2.15.1") { utils::globalVariables(c("detectCores","makeClu
 #'
 #'  maskM <- stim.M(phytotoma[,2:3], 131)
 #'
-#' reduce_cut <- reduce.env(env = predictor, occ_data = phytotoma[,2:3], mask=maskM)
+#' vrn <- extract(predictor, phytotoma[,2:3])
+#'
+#' # Correlogram
+#' rd <- c('bio_1','bio_12','biome')
+#' cor.show(vrn, rm=TRUE, var.rm=rd)
+#' 
+#' # Reduce spatial-data
+#' reduce_cut <- reduce.env(env = predictor, var.rm=rd, mask=maskM)
 #'
 #' # Plot reduce_cut
-#' plot(reduce_cut@cropa$bio1)
+#' plot(reduce_cut@cropa$bio16)
 #'
 #' # Add points
 #' points(phytotoma[,2:3], pch=16,col='blue')
 #'
-#' # Correlogram
-#' cor.show(reduce_cut)
-#' rd <- c('bio1','bio12','bio16','biome','bio8')
-#'
-#' # Removing rd-variables on correlogram
-#' cor.show(reduce_cut, rm=TRUE, var.rm = rd)
-#'
-#' # Remove rd-variables
-#' var_reduce <- dropLayer(reduce_cut@cropa, rd)
-#'
 #' # summary
-#' var_reduce
+#' reduce_cut
 #'
 #'
 #' @export
 #'
-reduce.env <- function(env, transfer=NULL, occ_data, mask, parallel = FALSE)
+reduce.env <- function(env, transfer=NULL, var.rm, mask)
 {
   ptm <- proc.time()
   if(is.null(env)){
     stop('You need to define environmental data')
   }
-  if (is.null(occ_data)){
-    stop('You need to define ocurrence data (Longitude/Latitude)')
+  if (is.null(var.rm)){
+    stop('You need to define variables to drop')
   }
   if(is.null(mask)){
     stop('You need to build M hypothesis before to do this')
   }
-
+  
+  mask.M <- mask
+  
   if(is.null(transfer)){
-    if(parallel == TRUE){
-      message('You have a one dataset, parallel = FALSE ' )
-    }
-    mask.M <- mask
-    # Corta las variables ambientales originales (todo el mundo) hacia el area de interes.
-    biovars.mask <- crop (env, mask.M)
-    biovars.mask <- mask (biovars.mask, mask.M)
-    layer.transfer <- list('Don not have environment data')
-    datavalue <- extract(env, occ_data)
-    datavalue <- na.omit(datavalue)
-
-  } else{
-    if(parallel == FALSE){
-      biovars.mask <- crop (env, mask.M)
-      biovars.mask <- mask (biovars.mask, mask.M)
-      
-      layer.transfer <- list()
-      
-      # Core function
-      for (i in 1:length(transfer)) {
-        layer.transfer[[i]] <- crop(transfer[[i]], mask.M)
-        layer.transfer[[i]] <- mask(layer.transfer[[i]], mask.M)
-      }
-      # Timer produce
-      # tock    <- proc.time()[3]
-      #  timeG[1] <- tock - tick
-      # --- End Timer
-      
-      datavalue <- extract(biovars.mask, occ_data)
-      datavalue <- na.omit(datavalue)  
-    } else {
-      biovars.mask <- crop (env, mask.M)
-      biovars.mask <- mask (biovars.mask, mask.M)
-      
-      #library(foreach)
-      #library(doParallel)
-      
-      cores = detectCores()
-      cl <- makeCluster(cores[1]-1) #not to overload your computer
-      
-      registerDoParallel(cl)
-      
-      layer.transfer <- list()
-
-      # Core function
-      layer.transfer <- foreach(i=1:length(transfer), .packages = 'raster') %dopar% {
-        
-        layer.transfer[[i]] <- crop(transfer[[i]], mask.M)
-        layer.transfer[[i]] <- mask(layer.transfer[[i]], mask.M)
-      };stopCluster(cl)
-      
-      
-      datavalue <- extract(biovars.mask, occ_data)
-      datavalue <- na.omit(datavalue)
-    }
     
-
+    # DropLayer
+    pr_var <- dropLayer(env, var.rm)
+    
+    #Mask of datalayer
+    biovars.mask <- raster::crop(pr_var, mask.M)
+    biovars.mask <- raster::mask(biovars.mask, mask.M)
+    
+    layer.transfer <- list()
+    datavalue <- matrix()
+  }else{
+    # DropLayer
+    pr_var <- dropLayer(env, var.rm)
+    fut_var <- dropLayer(transfer, var.rm)
+    
+    # Mask of datalayer
+    biovars.mask <- raster::crop(pr_var, mask.M)
+    biovars.mask <- raster::mask(biovars.mask, mask.M)
+    
+    # Mask of future datalayer
+    layer.transfer <- list()
+    # Core function
+    for (i in 1:length(fut_var)) {
+      layer.transfer[[i]] <- raster::crop(fut_var[[i]], mask.M)
+      layer.transfer[[i]] <- raster::mask(layer.transfer[[i]], mask.M)
+    }
+    datavalue <- matrix()
   }
-
   
   r <- EnvimRed(cropa = biovars.mask,
                  project = layer.transfer,
                  m.env = datavalue)
-
+  
   timed <- proc.time() - ptm
   t.min <- floor(timed[3] / 60)
   t.sec <- timed[3] - (t.min * 60)
   
-  paste("Environmental data completed in", t.min, "minutes", round(t.sec, 2), "seconds.")
+  message(paste("Environmental data completed in", t.min, "minutes", round(t.sec, 2), "seconds."))
 
   return(r)
 

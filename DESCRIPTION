@@ -18,12 +18,11 @@ Imports:
   sp,
   rgdal,
   rgeos,
-  rasterVis,
   tidyr,
   raster,
   dismo,
   geosphere,
-  doParallel,
+  rasterVis,
   dplyr,
   ggplot2,
   stats

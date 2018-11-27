@@ -1,8 +1,9 @@
+if (getRversion() >= "2.15.1") { utils::globalVariables(c("sd", "IQR"))}
 #' Build buffer zone to M
 #'
 #' Returns buffer zone based on ocurrence data
 
-stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
+stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 1, ncal = 1, ...)
 
 #'
 #' To define calibration area is crucial step (Barve et al., 2011),
@@ -15,6 +16,9 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
 #'
 #' @param occs data.frame of ocurrence data (longitude/latitude).
 #' @param radio radio of buffer.
+#' @param env if True. Environmental daataset used to build M. Only \code{method = 'Tol.pca'}
+#' @param Vrc Integer. sd(IQR) * value, used to increase range tolerance of dataset \code{env}
+#' @param ncal Integer. Dataset using to define IQR. Only \code{method = 'Tol.pca'}
 #' @param method default = 'user'. Another option is calculate the mean of all points 'mean'.
 #' @param bgeo Biogeographical layer. Categorical values.
 #' @param ... Optional features of buffer
@@ -37,7 +41,6 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
 #' 45(10-11): 667–674.
 #'
 #' @importFrom sp CRS SpatialPoints
-#' @import doParallel
 #' @examples
 #'
 #' # Phytotoma ocurrence data
@@ -52,70 +55,208 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', ...)
 #' @export
 
 {
-  METHODS <- c("user", "Mx.dist","mean")
   
-  method <- match.arg(method, METHODS)
-
-  if(method == "user")
-  {
-    if(is.null(radio))
-      stop('Define calibration radio')
-    radio
-    }
-  
-  if(method == "Mx.dist"){
-    dm <- geosphere::distm(occs)
-    radio <- max(dm)/1000
-  }
-  if(method == "mean"){
-    dm <- geosphere::distm(occs)
-    radio <- mean(dm)/1000
-  }
-
   if(is.null(bgeo)){
-    rat <- 1000 * radio
-    sp_po <- SpatialPoints(occs)
-    projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-    spbuf <- buffer(sp_po, width = rat)
-    plot(spbuf)
-    return(spbuf)
 
+    METHODS <- c("user", "Mx.dist","mean","Tol.pca")
+    
+    method <- match.arg(method, METHODS)
+    
+    if(method == "user")
+    {
+      if(is.null(radio)){
+        stop('Define calibration radio')
+      }else{
+        
+        rat <- 1000 * radio
+        sp_po <- SpatialPoints(occs)
+        projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
+        hM.pol <- buffer(sp_po, width = rat)
+        }
+    }
+    
+    if(method == "Mx.dist"){
+      dm <- geosphere::distm(occs)
+      radio <- max(dm)/1000
+      rat <- 1000 * radio
+      sp_po <- SpatialPoints(occs)
+      projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
+      hM.pol <- buffer(sp_po, width = rat)
+    }
+    if(method == "mean"){
+      dm <- geosphere::distm(occs)
+      radio <- mean(dm)/1000
+      rat <- 1000 * radio
+      sp_po <- SpatialPoints(occs)
+      projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
+      hM.pol <- buffer(sp_po, width = rat)
+    }
 
+    if(method == "Tol.pca"){
+      if(is.null(env)) {stop("Define env argument to build Tolerance Range")}
+      if(nlayers(env) <= ncal)
+        stop("Dataset define to build M is so longer")
+      
+      if(is.null(radio)){
+        dm <- geosphere::distm(occs)
+        radio <- mean(dm)/1000
+        rat <- 1000 * radio
+        sp_po <- SpatialPoints(occs)
+        projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
+        spbuf <- buffer(sp_po, width = rat)
+        
+        c1 <- raster::crop(env, spbuf)
+        c1 <- raster::mask(c1, spbuf)
+        
+      }else{
+        rat <- 1000 * radio
+        sp_po <- SpatialPoints(occs)
+        projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
+        spbuf <- buffer(sp_po, width = rat)
+        
+        c1 <- raster::crop(env, spbuf)
+        c1 <- raster::mask(c1, spbuf)
+        
+      }
+
+      gt_p <- as.data.frame(extract(c1, occs))
+      
+      contn <- list()
+      
+      for (i in 1:nlayers(c1)) {
+        
+        LsupC = quantile(gt_p[[i]], probs = 0.75) + 1.5 * (IQR(gt_p[[i]])) + sd(gt_p[[i]]) * Vrc
+        LinfC =  quantile(gt_p[[i]], probs = 0.25) - 1.5 * (IQR(gt_p[[i]])) - sd(gt_p[[i]]) * Vrc
+        
+        s1 <- ifelse(getValues(c1[[i]]) > LinfC & getValues(c1[[i]]) < LsupC, 1, 0 )
+        m1 <- setValues(c1[[i]], s1)
+        
+        contn[[i]] <- m1 
+      }; contn <- stack(contn)
+      
+      contn <- calc(contn, sum)
+      #plot(contn)
+      
+      s1 <- ifelse(getValues(contn) >= ncal, 1, 0)
+      # Re
+      hM.ras <- setValues(contn, s1)
+      #plot(hM)
+      
+      hM.pol <- rasterToPolygons(hM.ras, fun=function(x){x==1}, dissolve = T) 
+      #plot(hM.pol)
+      #return(hM.pol)
+    }
+    return(hM.pol)
   }else{
-
+    
     b_ex <- raster::extract(bgeo, occs)
     b_ex <- unique(b_ex$Province_1)
     b_ex <- as.vector(b_ex)
-
+    
     shapeOut <- subset(bgeo, bgeo@data[,4] %in% b_ex)
-
-    #plot(shapeOut)
-    #points(occ[,2:3], pch=16,cex=0.5)
+    
     rat <- 1000 * radio
-    sp_po <- SpatialPoints(occs)
-    projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-    projection(shapeOut) <- CRS('+proj=longlat +datum=WGS84')
     spbuf <- buffer(sp_po, width = rat)
-
-    #plot(bu_z)
-    #points(occ[,2:3], pch=16,cex=0.5)
-
-
-    spbuf <- raster::crop(shapeOut, spbuf)
-    spbuf <- raster::mask(spbuf, spbuf)
     
-    #plot(spbuf)
-    #plot(M.zo)
-    paste0('Mask based on Biogeography. Morrone (2014)')
-    spbuf <- crop(shapeOut, spbuf)
-    #spbuf <- mask(spbuf, spbuf)
     
-    plot(spbuf)
-    #plot(M.zo)
-    paste0('Mask based on Biogeography. Morrone (2014)')
-    paste0('We have defined the buffer radio: ', rat, ' Km')
-    #paste0(b_ex)
-    return(spbuf)
-  }
+    METHODS <- c("user", "Mx.dist","mean","Tol.pca")
+    
+    method <- match.arg(method, METHODS)
+    
+    if(method == "user")
+    {
+      if(is.null(radio))
+        stop('Define calibration radio')
+      radio
+      
+      rat <- 1000 * radio
+      sp_po <- SpatialPoints(occs)
+      projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
+      shapeOut <- buffer(sp_po, width = rat)
+      
+      hM.pol <- intersect(shapeOut, spbuf)
+      
+    }
+    
+    if(method == "Mx.dist"){
+      dm <- geosphere::distm(occs)
+      radio <- max(dm)/1000
+      
+      rat <- 1000 * radio
+      sp_po <- SpatialPoints(occs)
+      projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
+      shapeOut <- buffer(sp_po, width = rat)
+      
+      hM.pol <- intersect(shapeOut, spbuf)
+    }
+    if(method == "mean"){
+      dm <- geosphere::distm(occs)
+      radio <- mean(dm)/1000
+      
+      rat <- 1000 * radio
+      sp_po <- SpatialPoints(occs)
+      projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
+      shapeOut <- buffer(sp_po, width = rat)
+      
+      hM.pol <- intersect(shapeOut, spbuf)
+    }
+    
 
+    if(method == "Tol.pca"){
+      if(is.null(env))
+        stop("Define env argument to build Tolerance Range")
+      if(nlayers(env) <= ncal)
+        stop("Dataset define to build M is so longer")
+      
+      if(is.null(radio)){
+        c1 <- raster::crop(env, spbuf)
+        c1 <- raster::mask(c1, spbuf)
+        
+      }else{
+        rat <- 1000 * radio
+        sp_po <- SpatialPoints(occs)
+        projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
+        spbuf <- buffer(sp_po, width = rat)
+        
+        temp.M <- intersect(shapeOut, spbuf)
+        
+        c1 <- raster::crop(env, temp.M)
+        c1 <- raster::mask(c1, temp.M)
+        
+      }
+      
+      gt_p <- as.data.frame(extract(c1, occs))
+      
+      contn <- list()
+      
+      for (i in 1:nlayers(c1)) {
+        
+        LsupC = quantile(gt_p[[i]], probs = 0.75) + 1.5 * (IQR(gt_p[[i]])) + sd(gt_p[[i]]) * Vrc
+        LinfC =  quantile(gt_p[[i]], probs = 0.25) - 1.5 * (IQR(gt_p[[i]])) - sd(gt_p[[i]]) * Vrc
+        
+        s1 <- ifelse(getValues(c1[[i]]) > LinfC & getValues(c1[[i]]) < LsupC, 1, 0 )
+        m1 <- setValues(c1[[i]], s1)
+        
+        contn[[i]] <- m1 
+      }; contn <- stack(contn)
+      
+      
+      contn <- calc(contn, sum)
+      #plot(contn)
+      
+      s1 <- ifelse(getValues(contn) >= ncal, 1, 0)
+      # Re
+      hM.ras <- setValues(contn, s1)
+      #plot(hM)
+      
+      hM.pol <- rasterToPolygons(hM.ras, fun=function(x){x==1}, dissolve = T) 
+      #plot(hM.pol)
+      return(hM.pol)
+      
+      #message(paste0('We have defined the M radio based on', method , 'method'))
+    
+
+    }
+  } 
 }
+
