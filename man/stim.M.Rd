@@ -2,13 +2,7 @@
 % Please edit documentation in R/stim.M.R
 \name{stim.M}
 \alias{stim.M}
-\title{To define calibration area is crucial step (Barve et al., 2011),
-even more with incomplete sample data sometime is
-complicated, because to get complete sample within geography space
-is dificult, in these cases is apropiate define M with buffer zone
- (Peterson et al., 2017); and in other cases it helps to cut the
-ends of the calibration area based on the maximum dispersion capacity
-(Atauchi et al., 2018).}
+\title{Build buffer zone to M}
 \usage{
 stim.M(occs, radio = NULL, bgeo = NULL, method = "user",
   env = NULL, Vrc = 1, ncal = 1, ...)
@@ -34,6 +28,9 @@ stim.M(occs, radio = NULL, bgeo = NULL, method = "user",
 SpatialPolygons* object
 }
 \description{
+Returns buffer zone based on ocurrence data
+}
+\details{
 To define calibration area is crucial step (Barve et al., 2011),
 even more with incomplete sample data sometime is
 complicated, because to get complete sample within geography space

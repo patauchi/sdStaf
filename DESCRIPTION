@@ -13,7 +13,7 @@ License: GPL-2
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
-Depends: methods, R (>= 3.2.0)
+Depends: methods
 Imports:
   sp,
   rgdal,

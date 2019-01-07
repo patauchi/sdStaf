@@ -1,14 +1,22 @@
-  
-  #'
-  #' To define calibration area is crucial step (Barve et al., 2011),
-  #' even more with incomplete sample data sometime is
-  #' complicated, because to get complete sample within geography space
-  #' is dificult, in these cases is apropiate define M with buffer zone
-  #'  (Peterson et al., 2017); and in other cases it helps to cut the
-  #' ends of the calibration area based on the maximum dispersion capacity
-  #' (Atauchi et al., 2018).
-  #'
-  #' @param occs data.frame of ocurrence data (longitude/latitude).
+if (getRversion() >= "2.15.1") { utils::globalVariables(c("sd", "IQR"))}
+#' Build buffer zone to M
+#' 
+#' Returns buffer zone based on ocurrence data
+
+
+stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 1, ncal = 1, ...)
+
+
+#'
+#' To define calibration area is crucial step (Barve et al., 2011),
+#' even more with incomplete sample data sometime is
+#' complicated, because to get complete sample within geography space
+#' is dificult, in these cases is apropiate define M with buffer zone
+#'  (Peterson et al., 2017); and in other cases it helps to cut the
+#' ends of the calibration area based on the maximum dispersion capacity
+#' (Atauchi et al., 2018).
+#'
+#' @param occs data.frame of ocurrence data (longitude/latitude).
 #' @param radio radio of buffer.
 #' @param env if True. Environmental daataset used to build M. Only \code{method = 'Tol.pca'}
 #' @param Vrc Integer. sd(IQR) * value, used to increase range tolerance of dataset \code{env}
