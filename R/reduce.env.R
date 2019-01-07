@@ -39,21 +39,10 @@
 #'
 #' vrn <- extract(predictor, phytotoma[,2:3])
 #'
-#' # Correlogram
-#' rd <- c('bio_1','bio_12','biome')
+#' # Correlogram s
+#' rd <- c('bio1','bio12','biome')
 #' cor.show(vrn, rm=TRUE, var.rm=rd)
 #' 
-#' # Reduce spatial-data
-#' reduce_cut <- reduce.env(env = predictor, var.rm=rd, mask=maskM)
-#'
-#' # Plot reduce_cut
-#' plot(reduce_cut@cropa$bio16)
-#'
-#' # Add points
-#' points(phytotoma[,2:3], pch=16,col='blue')
-#'
-#' # summary
-#' reduce_cut
 #'
 #'
 #' @export

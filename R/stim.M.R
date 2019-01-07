@@ -56,6 +56,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
 #'
 #' @export
 #' 
+#' 
 stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 1, ncal = 1, ...)
   
 {
@@ -178,7 +179,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
       projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
       spbuf <- buffer(sp_po, width = rat)
       
-      hM.pol <- intersect(shapeOut, spbuf)
+      hM.pol <- raster::intersect(shapeOut, spbuf)
       
     }
     
@@ -265,3 +266,5 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
   } 
   return(hM.pol)
 }
+
+
