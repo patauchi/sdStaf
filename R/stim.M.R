@@ -1,4 +1,3 @@
-function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 1, ncal = 1, ...)
   
   #'
   #' To define calibration area is crucial step (Barve et al., 2011),
@@ -48,7 +47,9 @@ function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 1, ncal = 
 #' points(phytotoma[,2:3])
 #'
 #' @export
-
+#' 
+stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 1, ncal = 1, ...)
+  
 {
   
   if(is.null(bgeo)){
