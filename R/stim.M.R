@@ -57,8 +57,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
 #' @export
 #' 
 #' 
-stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 1, ncal = 1, ...)
-  
+
 {
   
   if(is.null(bgeo)){
@@ -76,7 +75,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
         rat <- 1000 * radio
         sp_po <- SpatialPoints(occs)
         projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-        hM.pol <- buffer(sp_po, width = rat)
+        hM.pol <- raster::buffer(sp_po, width = rat)
       }
     }
     
@@ -86,7 +85,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
       rat <- 1000 * radio
       sp_po <- SpatialPoints(occs)
       projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-      hM.pol <- buffer(sp_po, width = rat)
+      hM.pol <- raster::buffer(sp_po, width = rat)
     }
     if(method == "mean"){
       dm <- geosphere::distm(occs)
@@ -94,7 +93,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
       rat <- 1000 * radio
       sp_po <- SpatialPoints(occs)
       projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-      hM.pol <- buffer(sp_po, width = rat)
+      hM.pol <- raster::buffer(sp_po, width = rat)
     }
     
     if(method == "Tol.pca"){
@@ -108,7 +107,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
         rat <- 1000 * radio
         sp_po <- SpatialPoints(occs)
         projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-        spbuf <- buffer(sp_po, width = rat)
+        spbuf <- raster::buffer(sp_po, width = rat)
         
         c1 <- raster::crop(env, spbuf)
         c1 <- raster::mask(c1, spbuf)
@@ -117,7 +116,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
         rat <- 1000 * radio
         sp_po <- SpatialPoints(occs)
         projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-        spbuf <- buffer(sp_po, width = rat)
+        spbuf <- raster::buffer(sp_po, width = rat)
         
         c1 <- raster::crop(env, spbuf)
         c1 <- raster::mask(c1, spbuf)
@@ -177,7 +176,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
       rat <- 1000 * radio
       sp_po <- SpatialPoints(occs)
       projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-      spbuf <- buffer(sp_po, width = rat)
+      spbuf <- raster::buffer(sp_po, width = rat)
       
       hM.pol <- raster::intersect(shapeOut, spbuf)
       
@@ -190,9 +189,9 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
       rat <- 1000 * radio
       sp_po <- SpatialPoints(occs)
       projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-      spbuf <- buffer(sp_po, width = rat)
+      spbuf <- raster::buffer(sp_po, width = rat)
       
-      hM.pol <- intersect(shapeOut, spbuf)
+      hM.pol <- raster::intersect(shapeOut, spbuf)
     }
     if(method == "mean"){
       dm <- geosphere::distm(occs)
@@ -201,9 +200,9 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
       rat <- 1000 * radio
       sp_po <- SpatialPoints(occs)
       projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-      spbuf <- buffer(sp_po, width = rat)
+      spbuf <- raster::buffer(sp_po, width = rat)
       
-      hM.pol <- intersect(shapeOut, spbuf)
+      hM.pol <- raster::intersect(shapeOut, spbuf)
     }
     
     
@@ -222,7 +221,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
         sp_po <- SpatialPoints(occs)
         projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
         projection(shapeOut) <- CRS('+proj=longlat +datum=WGS84')
-        spbuf <- buffer(sp_po, width = rat)
+        spbuf <- raster::buffer(sp_po, width = rat)
         
         temp.M <- raster::intersect(shapeOut, spbuf)
         
