@@ -1,20 +1,15 @@
-if (getRversion() >= "2.15.1") { utils::globalVariables(c("sd", "IQR"))}
-#' Build buffer zone to M
-#'
-#' Returns buffer zone based on ocurrence data
-
-stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 1, ncal = 1, ...)
-
-#'
-#' To define calibration area is crucial step (Barve et al., 2011),
-#' even more with incomplete sample data sometime is
-#' complicated, because to get complete sample within geography space
-#' is dificult, in these cases is apropiate define M with buffer zone
-#'  (Peterson et al., 2017); and in other cases it helps to cut the
-#' ends of the calibration area based on the maximum dispersion capacity
-#' (Atauchi et al., 2018).
-#'
-#' @param occs data.frame of ocurrence data (longitude/latitude).
+function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 1, ncal = 1, ...)
+  
+  #'
+  #' To define calibration area is crucial step (Barve et al., 2011),
+  #' even more with incomplete sample data sometime is
+  #' complicated, because to get complete sample within geography space
+  #' is dificult, in these cases is apropiate define M with buffer zone
+  #'  (Peterson et al., 2017); and in other cases it helps to cut the
+  #' ends of the calibration area based on the maximum dispersion capacity
+  #' (Atauchi et al., 2018).
+  #'
+  #' @param occs data.frame of ocurrence data (longitude/latitude).
 #' @param radio radio of buffer.
 #' @param env if True. Environmental daataset used to build M. Only \code{method = 'Tol.pca'}
 #' @param Vrc Integer. sd(IQR) * value, used to increase range tolerance of dataset \code{env}
@@ -57,7 +52,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
 {
   
   if(is.null(bgeo)){
-
+    
     METHODS <- c("user", "Mx.dist","mean","Tol.pca")
     
     method <- match.arg(method, METHODS)
@@ -72,7 +67,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
         sp_po <- SpatialPoints(occs)
         projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
         hM.pol <- buffer(sp_po, width = rat)
-        }
+      }
     }
     
     if(method == "Mx.dist"){
@@ -91,7 +86,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
       projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
       hM.pol <- buffer(sp_po, width = rat)
     }
-
+    
     if(method == "Tol.pca"){
       if(is.null(env)) {stop("Define env argument to build Tolerance Range")}
       if(nlayers(env) <= ncal)
@@ -118,7 +113,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
         c1 <- raster::mask(c1, spbuf)
         
       }
-
+      
       gt_p <- as.data.frame(extract(c1, occs))
       
       contn <- list()
@@ -150,13 +145,13 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
   }else{
     
     b_ex <- raster::extract(bgeo, occs)
-    b_ex <- unique(b_ex$Province_1)
+    b_ex <- unique(b_ex$ECO_NAME)
     b_ex <- as.vector(b_ex)
     
     shapeOut <- subset(bgeo, bgeo@data[,4] %in% b_ex)
-    
-    rat <- 1000 * radio
-    spbuf <- buffer(sp_po, width = rat)
+    projection(shapeOut) <- CRS('+proj=longlat +datum=WGS84')
+    #rat <- 1000 * radio
+    #spbuf <- buffer(sp_po, width = rat)
     
     
     METHODS <- c("user", "Mx.dist","mean","Tol.pca")
@@ -172,7 +167,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
       rat <- 1000 * radio
       sp_po <- SpatialPoints(occs)
       projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-      shapeOut <- buffer(sp_po, width = rat)
+      spbuf <- buffer(sp_po, width = rat)
       
       hM.pol <- intersect(shapeOut, spbuf)
       
@@ -185,7 +180,7 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
       rat <- 1000 * radio
       sp_po <- SpatialPoints(occs)
       projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-      shapeOut <- buffer(sp_po, width = rat)
+      spbuf <- buffer(sp_po, width = rat)
       
       hM.pol <- intersect(shapeOut, spbuf)
     }
@@ -196,12 +191,12 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
       rat <- 1000 * radio
       sp_po <- SpatialPoints(occs)
       projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
-      shapeOut <- buffer(sp_po, width = rat)
+      spbuf <- buffer(sp_po, width = rat)
       
       hM.pol <- intersect(shapeOut, spbuf)
     }
     
-
+    
     if(method == "Tol.pca"){
       if(is.null(env))
         stop("Define env argument to build Tolerance Range")
@@ -209,23 +204,24 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
         stop("Dataset define to build M is so longer")
       
       if(is.null(radio)){
-        c1 <- raster::crop(env, spbuf)
-        c1 <- raster::mask(c1, spbuf)
+        c1 <- raster::crop(env, shapeOut)
+        c1 <- raster::mask(c1, shapeOut)
         
       }else{
         rat <- 1000 * radio
         sp_po <- SpatialPoints(occs)
         projection(sp_po) <- CRS('+proj=longlat +datum=WGS84')
+        projection(shapeOut) <- CRS('+proj=longlat +datum=WGS84')
         spbuf <- buffer(sp_po, width = rat)
         
-        temp.M <- intersect(shapeOut, spbuf)
+        temp.M <- raster::intersect(shapeOut, spbuf)
         
         c1 <- raster::crop(env, temp.M)
         c1 <- raster::mask(c1, temp.M)
         
       }
       
-      gt_p <- as.data.frame(extract(c1, occs))
+      gt_p <- as.data.frame(extract(c1, occs)) %>% na.omit()
       
       contn <- list()
       
@@ -251,12 +247,12 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
       
       hM.pol <- rasterToPolygons(hM.ras, fun=function(x){x==1}, dissolve = T) 
       #plot(hM.pol)
-      return(hM.pol)
+      
       
       #message(paste0('We have defined the M radio based on', method , 'method'))
-    
-
+      
+      
     }
   } 
+  return(hM.pol)
 }
-
