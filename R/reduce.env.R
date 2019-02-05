@@ -74,9 +74,12 @@ reduce.env <- function(env, transfer=NULL, var.rm, mask)
     layer.transfer <- list()
     datavalue <- matrix()
   }else{
-    # DropLayer
-    pr_var <- dropLayer(env, var.rm)
-    fut_var <- dropLayer(transfer, var.rm)
+    # Subset
+    pr_var <- raster::subset(env, var.rm)
+    fut_var <- list()
+    for (i in 1:length(transfer)) {
+      fut_var[[i]] <- raster::subset(transfer[[i]], var.rm)
+    }
     
     # Mask of datalayer
     biovars.mask <- raster::crop(pr_var, mask.M)
