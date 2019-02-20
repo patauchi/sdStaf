@@ -154,10 +154,13 @@ stim.M <- function (occs, radio=NULL, bgeo=NULL, method='user', env=NULL, Vrc = 
   }else{
     
     b_ex <- raster::extract(bgeo, occs)
-    b_ex <- unique(b_ex$IDS)
+    b_ex <- unique(b_ex$Province_1)
     b_ex <- as.vector(b_ex)
     
-    shapeOut <- subset(bgeo, bgeo@data[,17] %in% b_ex)
+    #shapeOut <- subset(bgeo, bgeo@data[,17] %in% b_ex)
+    
+    shapeOut <- subset(bgeo, bgeo@data[,4] %in% b_ex)
+    
     projection(shapeOut) <- CRS('+proj=longlat +datum=WGS84')
     #rat <- 1000 * radio
     #spbuf <- buffer(sp_po, width = rat)
