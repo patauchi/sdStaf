@@ -18,7 +18,10 @@ library(sdStaf)
 
 ## Citation
 
-citation('sdStaf)
+
+```r
+citation(sdStaf)
+```
 
 
 Museo de Historia Natural de Cusco (MHNC), Univerisdad Nacional de San Antonio Abad del Cusco.
