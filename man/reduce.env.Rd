@@ -48,7 +48,7 @@ vrn <- extract(predictor, phytotoma[,2:3])
 
 # Correlogram s
 rd <- c('bio1','bio12','biome')
-cor.show(vrn, rm=TRUE, var.rm=rd)
+cor.show(vrn, remove=TRUE, var.rm=rd)
 
 
 

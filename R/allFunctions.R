@@ -87,18 +87,116 @@ stabl.con <- function(p, q, thr.value){
   mr3 <- matrix(t3, ncol = 3, byrow = TRUE)
   stab.sal <- reclassify(stab, mr3, right=FALSE)
 
-
-  #plot(stab.sal)
-  #con.rast <- stack(q.val, c_pre)
-  #mX.lost <- function(x, y, q = 2, p = -1) {ifelse(x < 0.1, p * q, x * y)}
-  #stab <- overlay(x=q.val,y=c_pre, fun = mX.lost, unstack=TRUE,forcefun=T)
-
-#writeRaster(stab.sal, 'Prueb.asc',overwrite=T)
-
-  #plot(stab)
-  #df <- data.frame(mapp)
-  #colnames(df) <- c("Longitude", "Latitude", "MODEL")
   return(stab.sal)
+}
+
+
+require(clusterGeneration)
+VIF_Selection<-function(df.Stack,thresh,trace=F,...){
+  
+  in_frame <- df.Stack
+  #library(fmsb)
+  if(any(!'data.frame' %in% class(in_frame))) in_frame<-data.frame(in_frame)
+  #get initial vif value for all comparisons of variables
+  vif_init<-NULL
+  var_names <- names(in_frame)
+  for(val in var_names){
+    regressors <- var_names[-which(var_names == val)]
+    form <- paste(regressors, collapse = '+')
+    form_in <- stats::formula(paste(val, '~', form))
+    vif_init<-rbind(vif_init, c(val, fmsb::VIF(stats::lm(form_in, data = in_frame, ...))))
+  }
+  vif_max<-max(as.numeric(vif_init[,2]), na.rm = TRUE)
+  if(vif_max < thresh){
+    if(trace==T){ #print output of each iteration
+      prmatrix(vif_init,collab=c('var','vif'),rowlab=rep('',nrow(vif_init)),quote=F)
+      cat('\n')
+      cat(paste('All variables have VIF < ', thresh,', max VIF ',round(vif_max,2), sep=''),'\n\n')
+    }
+    return(var_names)
+  }
+  else{
+    in_dat<-in_frame
+    #backwards selection of explanatory variables, stops when all VIF values are below 'thresh'
+    while(vif_max >= thresh){
+      vif_vals<-NULL
+      var_names <- names(in_dat)
+      for(val in var_names){
+        regressors <- var_names[-which(var_names == val)]
+        form <- paste(regressors, collapse = '+')
+        form_in <- stats::formula(paste(val, '~', form))
+        vif_add<-fmsb::VIF(stats::lm(form_in, data = in_dat, ...))
+        vif_vals<-rbind(vif_vals,c(val,vif_add))
+      }
+      max_row<-which(vif_vals[,2] == max(as.numeric(vif_vals[,2]), na.rm = TRUE))[1]
+      vif_max<-as.numeric(vif_vals[max_row,2])
+      if(vif_max<thresh) break
+      if(trace==T){ #print output of each iteration
+        prmatrix(vif_vals,collab=c('var','vif'),rowlab=rep('',nrow(vif_vals)),quote=F)
+        cat('\n')
+        cat('removed: ',vif_vals[max_row,1],vif_max,'\n\n')
+        utils::flush.console()
+      }
+      in_dat<-in_dat[,!names(in_dat) %in% vif_vals[max_row,1]]
+    }
+    return(names(in_dat))
+  }
+}
+
+### CORRELATION
+MTHs_Heuristico <- function (df.Stack, multicollinearity.cutoff, 
+                             select.variables = TRUE, sample.points = FALSE, 
+                             plot = FALSE, method = "pearson") {
+  
+  if (!is.numeric(multicollinearity.cutoff)) {
+    stop("You must provide a numeric cutoff between 0 and 1 in multicollinearity.cutoff")
+  }
+  else if (multicollinearity.cutoff > 1 | multicollinearity.cutoff < 0) {
+    stop("You must provide a numeric cutoff between 0 and 1 in multicollinearity.cutoff")
+  }
+  #cor.matrix <- matrix(data = 0, nrow = nrow(df.Stack), 
+   #                    ncol = ncol(df.Stack), dimnames = list(names(df.Stack), 
+    #                                                          names(df.Stack)))
+  cor.matrix <- 1 - abs(stats::cor(df.Stack, method = method))
+  dist.matrix <- stats::as.dist(cor.matrix)
+  ahc <- stats::hclust(dist.matrix, method = "complete")
+  groups <- stats::cutree(ahc, h = 1 - multicollinearity.cutoff)
+  if (length(groups) == max(groups)) {
+    message(paste("  - No multicollinearity detected in your data at threshold ", 
+                  multicollinearity.cutoff, "\n", sep = ""))
+    mc <- FALSE
+  }
+  else {mc <- TRUE }
+  if (plot) {
+    op <- par(no.readonly = TRUE)
+    graphics::par(mar = c(5.1, 5.1, 4.1, 3.1))
+    plot(ahc, hang = -1, xlab = "", ylab = "Distance (1 - Pearson's r)", 
+         main = "", las = 1, sub = "", axes = F)
+    graphics::axis(2, at = seq(0, 1, length = 6), las = 1)
+    if (mc) {
+      graphics::title(paste("Groups of intercorrelated variables at cutoff", 
+                            multicollinearity.cutoff))
+      par(xpd = T)
+      stats::rect.hclust(ahc, h = 1 - multicollinearity.cutoff)
+    }
+    else {
+      graphics::title(paste("No intercorrelation among variables at cutoff", 
+                            multicollinearity.cutoff))
+    }
+    par(op)
+  }
+  if (select.variables) {
+    sel.vars <- NULL
+    for (i in 1:max(groups)) {sel.vars <- c(sel.vars, sample(names(groups[groups == i]), 1))}
+  }
+  else {
+    if (mc) {
+      sel.vars <- list()
+      for (i in groups) {sel.vars[[i]] <- names(groups)[groups == i]}
+    }
+    else {sel.vars <- names(df.Stack)}
+  }
+  return(sel.vars)
 }
 
 

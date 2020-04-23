@@ -4,8 +4,7 @@
 \alias{stability}
 \title{Stability of ecological niche models}
 \usage{
-stability(current = NULL, project = NULL, thr.value,
-  continue = FALSE)
+stability(current = NULL, project = NULL, thr.value, continue = FALSE)
 }
 \arguments{
 \item{current}{Raster* objet of present distribution.

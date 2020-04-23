@@ -4,12 +4,12 @@
 \alias{cor.show}
 \title{Correlogram plot}
 \usage{
-cor.show(values, rm = FALSE, var.rm)
+cor.show(values, remove = FALSE, var.rm)
 }
 \arguments{
 \item{values}{DataFrame-class.}
 
-\item{rm}{logical. If \code{TRUE}, allows remove some
+\item{remove}{logical. If \code{TRUE}, allows remove some
 variables from imput data set. (\code{default = FALSE})}
 
 \item{var.rm}{variables names of imput data set. Using
@@ -22,7 +22,21 @@ Correlogram plot
 Returns plot with correlation values among predicted variables.
 }
 \details{
-Correlation matrix based on pearson.
+Matrix based on Pearson correlation.
+}
+\examples{
+
+DFset <- data.frame(
+var1 = c(1,2,3,2,3,2,3,2,3,2,3,4,3,4,4),
+var2 = c(2,3,6,4,5,4,5,6,4,2,3,4,3,6,1),
+var3 = c(5,4,3,4,5,4,5,6,5,6,2,3,4,5,3),
+var4 = c(5,4,3,1,2,3,5,3,3,3,2,4,3,3,4),
+var5 = c(5,2,5,1,1,2,4,1,2,3,3,4,1,2,5),
+var6 = c(10,12,23,34,23,34,23,12,9,23,12,34,12,23,9))
+
+cor.show(DFset)
+
+
 }
 \seealso{
 \code{\link{reduce.env}}

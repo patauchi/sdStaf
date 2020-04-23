@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1") { utils::globalVariables(c("value"))}
 #' @importFrom ggplot2 geom_tile aes scale_fill_manual ggplot
 #' @importFrom rasterVis gplot
 #'
-#' @exportClass EnvimRed StabEcodist
+#' @exportClass EnvimRed StabEcodist VarSelection
 #'
 #' EnvimRed
 #' @name EnvimRed-class
@@ -30,6 +30,20 @@ EnvimRed <- setClass("EnvimRed",
 setClass("StabEcodist",
                       slots = c(df="data.frame",
                                 map="RasterLayer"))
+
+#'  VarSelection
+#' @name VarSelection-class
+#' @rdname VarSelection-class
+#' @slot variables A RasterBrinck
+#' @slot VarsSets A Matrix
+#'
+setClass("VarSelection", 
+         representation(variables = "list", 
+                        VarsSets = "character"))
+
+
+
+
 
 
 setMethod("print","StabEcodist",
@@ -57,6 +71,9 @@ setMethod("plot","StabEcodist",
                                            "blue"),
                                 name= "Stability map")
           })
+
+
+
 
 requireNamespace("sp", quietly=TRUE)
 requireNamespace("raster", quietly=TRUE)

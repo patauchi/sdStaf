@@ -4,8 +4,16 @@
 \alias{stim.M}
 \title{Build buffer zone to M}
 \usage{
-stim.M(occs, radio = NULL, bgeo = NULL, method = "user",
-  env = NULL, Vrc = 1, ncal = 1, ...)
+stim.M(
+  occs,
+  radio = NULL,
+  bgeo = NULL,
+  method = "user",
+  env = NULL,
+  Vrc = 1,
+  ncal = 1,
+  ...
+)
 }
 \arguments{
 \item{occs}{data.frame of ocurrence data (longitude/latitude).}

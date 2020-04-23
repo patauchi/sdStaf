@@ -1,19 +1,17 @@
 Package: sdStaf
 Type: Package
 Title: Species Distribution and Stability Future Models 
-Version: 1.0.4
+Version: 1.0.5
 Date: 2019-01-07
 Authors@R: c(person("P. Joser", "Atauchi", role = c("aut", "cre"),
-                     email = "patauchi@gmail.com"),
-                     person("A. Townsend", "Peterson", role = c("aut"),
-                     email = "town@ku.edu"))
+                     email = "patauchi@gmail.com"))
 Maintainer: P. Joser Atauchi <patauchi@gmail.com>
 Description: Functions for post processing the outcomes of ecological niche models. It further include methods to build stability maps based on species distribution models under climate change projections and to reduce environmental data.
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
-Depends: methods, R (>= 2.15.0)
+RoxygenNote: 7.1.0
+Depends: methods, R (>= 2.10)
 Imports:
   sp,
   rgdal,
@@ -25,7 +23,9 @@ Imports:
   rasterVis,
   dplyr,
   ggplot2,
-  stats
+  stats,
+  fmsb,
+  readr
 Suggests: 
     knitr,
     rmarkdown

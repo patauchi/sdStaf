@@ -4,7 +4,9 @@
 \name{phytotoma}
 \alias{phytotoma}
 \title{Peruvian Plantcutter Occurrence Data}
-\format{A data frame with 50 rows and 3 columns}
+\format{
+A data frame with 50 rows and 3 columns
+}
 \usage{
 data(phytotoma)
 }
