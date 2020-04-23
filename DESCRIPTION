@@ -3,7 +3,11 @@ Type: Package
 Title: Species Distribution and Stability Future Models 
 Version: 1.0.5
 Date: 2019-01-07
-Authors@R: c(person("P. Joser", "Atauchi", role = c("aut", "cre"))
+Authors@R: c(
+    person("P. Joser", "Atauchi",
+    email = "patauchi@gmail.com", 
+    role = c("aut", "cre"),
+    comment = c(ORCID = '0000-0001-6640-679X')))
 Maintainer: P. Joser Atauchi <patauchi@gmail.com>
 Description: Functions for post processing the outcomes of ecological niche models. It further include methods to build stability maps based on species distribution models under climate change projections and to reduce environmental data.
 License: GPL-3
