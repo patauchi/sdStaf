@@ -1,7 +1,7 @@
 Package: sdStaf
 Type: Package
 Title: Species Distribution and Stability Future Models 
-Version: 1.0.5
+Version: 1.0.6
 Date: 2019-01-07
 Authors@R: c(
     person("P. Joser", "Atauchi",
@@ -28,7 +28,9 @@ Imports:
   ggplot2,
   stats,
   fmsb,
-  readr
+  readr,
+  spThin,
+  ENMeval
 Suggests: 
     knitr,
     rmarkdown
