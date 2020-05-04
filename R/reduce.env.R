@@ -11,10 +11,10 @@
 #' the values of each point of occurrence of them.
 #'
 #' @param env RasterStack* objet.
-#' @param transfer List of rasterstack object
+#' @param transfer List of RasterStack object
 #' @param var.rm A data.frame of occurrence records.
 #'  It must include two column based on latitude and longitude.
-#' @param mask Croped mask, must be shapefile (.shp), readOGR.
+#' @param mask Cropped mask, must be shapefile (.shp), readOGR.
 #'
 #' @return
 #'

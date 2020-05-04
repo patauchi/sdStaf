@@ -23,7 +23,7 @@ stability <- function(current=NULL, project=NULL, thr.value,
 #' Return table with these features: \code{Models} and \code{nPixel}
 #' (frequency of pixel with that feature).
 #'
-#' Stability maps based on  binary species distirbution, give:
+#' Stability maps based on  binary species distribution, give:
 #'
 #'  \code{Values of 0 } Shows absence
 #'
@@ -36,7 +36,7 @@ stability <- function(current=NULL, project=NULL, thr.value,
 #'  two models predict agains)
 #'
 #'
-#'   \code{Values  > 100 } Shows stability or permanence. Differente models are defined as numbers (e.g.
+#'   \code{Values  > 100 } Shows stability or permanence. Different models are defined as numbers (e.g.
 #' value of \code{101} mentions one model predict stability, value of \code{102} mentions
 #' two models predict stability)
 #'

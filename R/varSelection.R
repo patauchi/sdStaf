@@ -12,7 +12,7 @@ varSelection <- function(df,
 #'  Variable selection using two approaches: vif and person correlation.
 #'
 #' @param df dataframe-class. 
-#' @param VarMethod Method used to variable selection. \code{vif} uses variance inflaction factor 
+#' @param VarMethod Method used to variable selection. \code{vif} uses variance inflation factor 
 #' based on \code{car} package. \code{correlation} uses pearson correlation to 
 #' select random variable using cutoff parameter. \code{both} use a two approaches describe above.
 #' @param vifs numeric vector. vif uses numeric vector to return variables selection.

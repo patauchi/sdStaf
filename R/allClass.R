@@ -12,7 +12,7 @@ if (getRversion() >= "2.15.1") { utils::globalVariables(c("value"))}
 #' EnvimRed
 #' @name EnvimRed-class
 #' @rdname EnvimRed-class
-#' @slot cropa A RasterBrinck
+#' @slot cropa A RasterBrick
 #' @slot m.env A Matrix
 #' @slot project A List
 EnvimRed <- setClass("EnvimRed",
