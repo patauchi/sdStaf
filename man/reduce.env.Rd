@@ -9,12 +9,12 @@ reduce.env(env, transfer = NULL, var.rm, mask)
 \arguments{
 \item{env}{RasterStack* objet.}
 
-\item{transfer}{List of rasterstack object}
+\item{transfer}{List of RasterStack object}
 
 \item{var.rm}{A data.frame of occurrence records.
 It must include two column based on latitude and longitude.}
 
-\item{mask}{Croped mask, must be shapefile (.shp), readOGR.}
+\item{mask}{Cropped mask, must be shapefile (.shp), readOGR.}
 }
 \value{
 \code{@crop} RasterStack* Objet

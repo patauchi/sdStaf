@@ -17,7 +17,7 @@ varSelection(
 \arguments{
 \item{df}{dataframe-class.}
 
-\item{VarMethod}{Method used to variable selection. \code{vif} uses variance inflaction factor 
+\item{VarMethod}{Method used to variable selection. \code{vif} uses variance inflation factor 
 based on \code{car} package. \code{correlation} uses pearson correlation to 
 select random variable using cutoff parameter. \code{both} use a two approaches describe above.}
 

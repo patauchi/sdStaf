@@ -11,7 +11,7 @@ myRefClass
 \section{Slots}{
 
 \describe{
-\item{\code{cropa}}{A RasterBrinck}
+\item{\code{cropa}}{A RasterBrick}
 
 \item{\code{m.env}}{A Matrix}
 
