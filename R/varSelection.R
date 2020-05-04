@@ -29,35 +29,6 @@ varSelection <- function(df,
 #' @importFrom graphics panel.smooth
 #'
 #' @seealso \code{\link{reduce.env}}
-#' 
-#' @examples
-#' 
-#' DFset <- data.frame(
-#' var1 = c(1,2,3,2,3,2,3,2,3,2,3,4,3,4,4),
-#' var2 = c(2,3,6,4,5,4,5,6,4,2,3,4,3,6,1),
-#' var3 = c(5,4,3,4,5,4,5,6,5,6,2,3,4,5,3),
-#' var4 = c(5,4,3,1,2,3,5,3,3,3,2,4,3,3,4),
-#' var5 = c(5,2,5,1,1,2,4,1,2,3,3,4,1,2,5),
-#' var6 = c(10,12,23,34,23,34,23,12,9,23,12,34,12,23,9))
-#' 
-#' # Pearson correlation method
-#' VarsKeep1 <- varSelection(DFset, VarMethod = 'correlation',  
-#'                        cutoff=0.75)
-#'                        
-#' # vif correlation method
-#' VarsKeep2 <- varSelection(DFset, VarMethod = 'vif', 
-#'                           vifs=c(2,5))
-#'                           
-#' # both aprroaches: vif and correlation
-#' VarsKeep3 <- varSelection(DFset, VarMethod = 'both', 
-#'                           vifs=c(2,5), cutoff = c(0.2,0.5))
-#' 
-#' # both aprroaches: vif and correlation. Removing some variables and keep vars
-#' VarsKeep4 <- varSelection(DFset, VarMethod = 'both', 
-#'                           vifs=c(2,5), cutoff = c(0.2,0.5),
-#'                           removeVariable=c('var1','var2'),
-#'                           keep_var = TRUE)
-#' 
 #'
 #' @export
 {

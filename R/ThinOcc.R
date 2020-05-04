@@ -1,5 +1,5 @@
-if (getRversion() >= "2.15.1") { utils::globalVariables(c("coordinates<-", "proj4string<-","over","mutate","fac",
-                                                          "Specie","Longitude","Latitude"))}
+if (getRversion() >= "2.15.1") { utils::globalVariables(c("coordinates<-", "proj4string<-","over","mutate",
+                                                          "Specie","Longitude","Latitude","fac"))}
 
 #' Thin Spatial Occurrence
 #'
@@ -26,16 +26,16 @@ ThinOcc <- function(df, NullRaster, SpeciesName=NULL, ThinRange=1, Polygon=NULL,
 #' 
 #' @export
 {
-  Occ <- df
-  env <- NullRaster
-  sp.name <- SpeciesName
+  Occ <- df # <- dfXY
+  env <- NullRaster#  <- predictor$bio1 
+  sp.name <- SpeciesName  # <- 'sp1'
   
   if(methods=='polygons'){
     if(is.null(Polygon)){stop(message('Polygon parameter is empty. Make sure that you are using a correct parameter.'))}
     
     colnames(Occ) <- c('X','Y')
     coordinates(Occ) <- ~X+Y
-    sps <- Polygon
+    sps <- Polygon#  <- sps
     
     proj4string(sps) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
     proj4string(Occ) <-  CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
@@ -82,35 +82,32 @@ ThinOcc <- function(df, NullRaster, SpeciesName=NULL, ThinRange=1, Polygon=NULL,
   
   
   ### Create background points
-  bg.pts <- dismo::randomPoints(env, 500)
+ suppressWarnings(bg.pts <- dismo::randomPoints(env, 500))
   
   ### Checkerboard1 partitioning method
   chk1.pts <- ENMeval::get.randomkfold(data_occ, bg.pts, 3)
   
   #points(data_occ, pch=23, bg=chk1.pts$occ.grp)
   
-  length(chk1.pts$occ.grp[chk1.pts$occ.grp==1])
-  length(chk1.pts$occ.grp[chk1.pts$occ.grp==2])
-  length(chk1.pts$occ.grp[chk1.pts$occ.grp==3])
+  #length(chk1.pts$occ.grp[chk1.pts$occ.grp==1])
+  #length(chk1.pts$occ.grp[chk1.pts$occ.grp==2])
+  #length(chk1.pts$occ.grp[chk1.pts$occ.grp==3])
   
-  data_occ <- data.frame(data_occ, fac=chk1.pts$occ.grp)#
+  data_occ2 <- data.frame(data_occ, fac = chk1.pts$occ.grp)#
   
-  train <- data_occ %>%
-    mutate(Specie = sp.name) %>%
-    filter(fac != 1) %>%
-    #filter(!fac %in% c(2,3)) %>%
+  train <- data_occ2 %>%
+    dplyr::filter(fac != 1) %>%
+    dplyr::mutate(Specie = sp.name) %>%
     dplyr::select(Specie, Longitude, Latitude) %>%
     data.frame()
   
-  test <- data_occ %>%
-    mutate(Specie = sp.name) %>%
-    filter(fac == 1) %>%
-    #filter(fac %in% c(2,3)) %>%
+  test <- data_occ2 %>%
+    dplyr::filter(fac == 1) %>%
+    dplyr::mutate(Specie = sp.name) %>%
     dplyr::select(Specie, Longitude, Latitude) 
   
-  joint <- data_occ %>%
-    mutate(Specie = sp.name) %>%
-    #filter(fac %in% c(2,3)) %>%
+  joint <- data_occ2 %>%
+    dplyr::mutate(Specie = sp.name) %>%
     dplyr::select(Specie, Longitude, Latitude) 
   
   
